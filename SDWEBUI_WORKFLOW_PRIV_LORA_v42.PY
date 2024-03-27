@@ -83,41 +83,6 @@ if not os.path.isfile(YUNET_ONNX_PATH):
 
 assert os.path.isfile(DL_PATH + "face_detection_yunet_2023mar.onnx")
 
-
-LORA_DIR = "/mnt/h/sd/lora/"
-
-FILE_LIST: list[str] = []
-LORAS: dict = {}
-TAG_DICT: dict = {}
-KW_LIST: list[str] = []
-COMBI_DICT: dict = {}
-WILDCARDS: dict = {}
-pl: list[str] = []
-K_DICT: dict = {}
-KW_DICT: dict = {}
-replace_list: dict = {}
-remove_list: list[str] = []
-prompt_loras: list = []
-unq_list: list = []
-w_loras: list = []
-cnt_list: list = []
-prompt_list: list[str] = []
-repl_keys = []
-KW_LIST = []
-
-
-BACKEND_TARGET_PAIRS = [
-    [cv2.dnn.DNN_BACKEND_OPENCV, cv2.dnn.DNN_TARGET_CPU],  # 0
-    [cv2.dnn.DNN_BACKEND_CUDA, cv2.dnn.DNN_TARGET_CUDA],  # 1
-    [cv2.dnn.DNN_BACKEND_CUDA, cv2.dnn.DNN_TARGET_CUDA_FP16],  # 2
-    [cv2.dnn.DNN_BACKEND_TIMVX, cv2.dnn.DNN_TARGET_NPU],  # 3
-    [cv2.dnn.DNN_BACKEND_CANN, cv2.dnn.DNN_TARGET_NPU],  # 4
-]
-backend_id = BACKEND_TARGET_PAIRS[0][0]
-target_id = BACKEND_TARGET_PAIRS[0][1]
-
-SAVE_DIR = "/mnt/r/sd/outputs/webui_i2i/"
-
 IMG_TYPES = [
     "blp",
     "bmp",
@@ -187,6 +152,41 @@ IMG_TYPES = [
     "nef",
 ]
 
+LORA_DIR = "/mnt/h/sd/lora/"
+
+FILE_LIST: list[str] = []
+LORAS: dict = {}
+TAG_DICT: dict = {}
+KW_LIST: list[str] = []
+COMBI_DICT: dict = {}
+WILDCARDS: dict = {}
+pl: list[str] = []
+K_DICT: dict = {}
+KW_DICT: dict = {}
+replace_list: dict = {}
+remove_list: list[str] = []
+prompt_loras: list = []
+unq_list: list = []
+w_loras: list = []
+cnt_list: list = []
+prompt_list: list[str] = []
+repl_keys = []
+KW_LIST = []
+
+
+BACKEND_TARGET_PAIRS = [
+    [cv2.dnn.DNN_BACKEND_OPENCV, cv2.dnn.DNN_TARGET_CPU],  # 0
+    [cv2.dnn.DNN_BACKEND_CUDA, cv2.dnn.DNN_TARGET_CUDA],  # 1
+    [cv2.dnn.DNN_BACKEND_CUDA, cv2.dnn.DNN_TARGET_CUDA_FP16],  # 2
+    [cv2.dnn.DNN_BACKEND_TIMVX, cv2.dnn.DNN_TARGET_NPU],  # 3
+    [cv2.dnn.DNN_BACKEND_CANN, cv2.dnn.DNN_TARGET_NPU],  # 4
+]
+backend_id = BACKEND_TARGET_PAIRS[0][0]
+target_id = BACKEND_TARGET_PAIRS[0][1]
+
+SAVE_DIR = "/mnt/r/sd/outputs/webui_i2i/"
+
+
 replace_list: dict = {}
 remove_list: list[str] = []
 
@@ -194,6 +194,7 @@ replace_list: dict = {"": ""}
 
 # undesirable keywords / strings
 remove_list: list[str] = [""]
+
 
 face_hd = [
     "High Quality",
@@ -278,6 +279,7 @@ hr_upscaler_index = [
     "ScuNET PSNR",
     "SwinIR_4x",
 ]
+
 
 class YuNet:
     import cv2
@@ -874,234 +876,143 @@ sampler_list = [x["name"] for x in sd.sampler_dicts]
 sd.hr_upscaler_index = hr_upscaler_index
 
 
-# def ESI():
-#     return sd.api.extra_single_image(
-#         codeformer_visibility        = sd.codeformer_visibility,
-#         codeformer_weight            = sd.codeformer_weight,
-#         extras_upscaler_2_visibility = sd.extras_upscaler_2_visibility,
-#         gfpgan_visibility            = sd.gfpgan_visibility,
-#         image                        = sd.image,
-#         resize_mode                  = sd.resize_mode,
-#         show_extras_results          = sd.show_extras_results,
-#         upscale_first                = sd.upscale_first,
-#         upscaler_1                   = sd.upscaler_1,
-#         upscaler_2                   = sd.upscaler_2,
-#         upscaling_crop               = sd.upscaling_crop,
-#         upscaling_resize             = sd.upscaling_resize,
-#         upscaling_resize_h           = sd.upscaling_resize_h,
-#         upscaling_resize_w           = sd.upscaling_resize_w,
-#         use_async                    = sd.use_async,
-# )
-
-
-# def EBI():
-#     return sd.api.extra_batch_images(
-#         codeformer_visibility           = sd.codeformer_visibility,
-#         codeformer_weight               = sd.codeformer_weight,
-#         extras_upscaler_2_visibility    = sd.extras_upscaler_2_visibility,
-#         gfpgan_visibility               = sd.gfpgan_visibility,
-#         images                          = sd.images,
-#         name_list                       = sd.name_list,
-#         resize_mode                     = sd.resize_mode,
-#         show_extras_results             = sd.show_extras_results,
-#         upscale_first                   = sd.upscale_first,
-#         upscaler_1                      = sd.upscaler_1,
-#         upscaler_2                      = sd.upscaler_2,
-#         upscaling_crop                  = sd.upscaling_crop,
-#         upscaling_resize                = sd.upscaling_resize,
-#         upscaling_resize_h              = sd.upscaling_resize_h,
-#         upscaling_resize_w              = sd.upscaling_resize_w,
-#         use_async                       = sd.use_async,
-# )
-
-
-def TXT2IMG(
-    alwayson_scripts=sd.alwayson_scripts,
-    batch_size=sd.batch_size,
-    cfg_scale=sd.cfg_scale,
-    denoising_strength=sd.denoising_strength,
-    do_not_save_grid=sd.do_not_save_grid,
-    do_not_save_samples=sd.do_not_save_samples,
-    enable_hr=sd.enable_hr,
-    eta=sd.eta,
-    firstphase_height=sd.firstphase_height,
-    firstphase_width=sd.firstphase_width,
-    height=sd.height,
-    hr_resize_x=sd.hr_resize_x,
-    hr_resize_y=sd.hr_resize_y,
-    hr_scale=sd.hr_scale,
-    hr_second_pass_steps=sd.hr_second_pass_steps,
-    hr_upscaler=sd.hr_upscaler,
-    n_iter=sd.n_iter,
-    negative_prompt=sd.negative_prompt,
-    override_settings=sd.override_settings,
-    override_settings_restore_afterwards=sd.override_settings_restore_afterwards,
-    prompt=sd.prompt,
-    restore_faces=sd.restore_faces,
-    s_churn=sd.s_churn,
-    s_noise=sd.s_noise,
-    s_tmax=sd.s_tmax,
-    s_tmin=sd.s_tmin,
-    sampler_index=None,
-    sampler_name=sd.sampler_name,
-    save_images=sd.save_images,
-    script_args=sd.script_args,
-    script_name=sd.script_name,
-    seed=sd.seed,
-    seed_resize_from_h=sd.seed_resize_from_h,
-    seed_resize_from_w=sd.seed_resize_from_w,
-    send_images=sd.send_images,
-    steps=sd.steps,
-    styles=sd.styles,
-    subseed=sd.subseed,
-    subseed_strength=sd.subseed_strength,
-    tiling=sd.tiling,
-    use_async=sd.use_async,
-    use_deprecated_controlnet=sd.use_deprecated_controlnet,
-    width=sd.width,
-) -> Image.Image:
-    return sd.api.txt2img(
-        alwayson_scripts=alwayson_scripts,
-        batch_size=batch_size,
-        cfg_scale=cfg_scale,
-        denoising_strength=denoising_strength,
-        do_not_save_grid=do_not_save_grid,
-        do_not_save_samples=do_not_save_samples,
-        enable_hr=enable_hr,
-        eta=eta,
-        firstphase_height=firstphase_height,
-        firstphase_width=firstphase_width,
-        height=height,
-        hr_resize_x=hr_resize_x,
-        hr_resize_y=hr_resize_y,
-        hr_scale=hr_scale,
-        hr_second_pass_steps=hr_second_pass_steps,
-        hr_upscaler=hr_upscaler,
-        n_iter=n_iter,
-        negative_prompt=negative_prompt,
-        override_settings=override_settings,
-        override_settings_restore_afterwards=override_settings_restore_afterwards,
-        prompt=prompt,
-        restore_faces=restore_faces,
-        s_churn=s_churn,
-        s_noise=s_noise,
-        s_tmax=s_tmax,
-        s_tmin=s_tmin,
-        sampler_index=sampler_index,
-        sampler_name=sampler_name,
-        save_images=save_images,
-        script_args=script_args,
-        script_name=script_name,
-        seed=seed,
-        seed_resize_from_h=seed_resize_from_h,
-        seed_resize_from_w=seed_resize_from_w,
-        send_images=send_images,
-        steps=steps,
-        styles=styles,
-        subseed=subseed,
-        subseed_strength=subseed_strength,
-        tiling=tiling,
-        use_async=use_async,
-        use_deprecated_controlnet=use_deprecated_controlnet,
-        width=width,
+def IMG2IMG() -> list[Image.Image]:
+    return sd.api.img2img(
+        steps=sd.steps,
+        images=sd.images,
+        resize_mode=sd.resize_mode,
+        denoising_strength=sd.denoising_strength,
+        image_cfg_scale=sd.image_cfg_scale,
+        mask_image=sd.mask_image,
+        mask_blur=sd.mask_blur,
+        inpainting_fill=sd.inpainting_fill,
+        inpaint_full_res=sd.inpaint_full_res,
+        inpaint_full_res_padding=sd.inpaint_full_res_padding,
+        inpainting_mask_invert=sd.inpainting_mask_invert,
+        initial_noise_multiplier=sd.initial_noise_multiplier,
+        prompt=sd.prompt,
+        styles=sd.styles,
+        seed=sd.seed,
+        subseed=sd.subseed,
+        subseed_strength=sd.subseed_strength,
+        seed_resize_from_h=sd.seed_resize_from_h,
+        seed_resize_from_w=sd.seed_resize_from_w,
+        sampler_name=sd.sampler_name,
+        batch_size=sd.batch_size,
+        n_iter=sd.n_iter,
+        cfg_scale=sd.cfg_scale,
+        width=sd.width,
+        height=sd.height,
+        restore_faces=sd.restore_faces,
+        tiling=sd.tiling,
+        do_not_save_samples=sd.do_not_save_samples,
+        do_not_save_grid=sd.do_not_save_grid,
+        negative_prompt=sd.negative_prompt,
+        eta=sd.eta,
+        s_churn=sd.s_churn,
+        s_tmax=sd.s_tmax,
+        s_tmin=sd.s_tmin,
+        s_noise=sd.s_noise,
+        override_settings=sd.override_settings,
+        override_settings_restore_afterwards=sd.override_settings_restore_afterwards,
+        script_args=sd.script_args,
+        include_init_images=sd.include_init_images,
+        script_name=sd.script_name,
+        send_images=sd.send_images,
+        save_images=sd.save_images,
+        alwayson_scripts=sd.alwayson_scripts,
+        controlnet_units=sd.controlnet_units,
+        use_deprecated_controlnet=sd.use_deprecated_controlnet,
+        use_async=sd.use_async,
     )
 
 
-def IMG2IMG(
-    alwayson_scripts=sd.alwayson_scripts,
-    batch_size=sd.batch_size,
-    cfg_scale=sd.cfg_scale,
-    controlnet_units=sd.controlnet_units,
-    denoising_strength=sd.denoising_strength,
-    do_not_save_grid=sd.do_not_save_grid,
-    do_not_save_samples=sd.do_not_save_samples,
-    eta=sd.eta,
-    height=sd.height,
-    image_cfg_scale=sd.image_cfg_scale,
-    images=sd.images,
-    include_init_images=sd.include_init_images,
-    initial_noise_multiplier=sd.initial_noise_multiplier,
-    inpaint_full_res=sd.inpaint_full_res,
-    inpaint_full_res_padding=sd.inpaint_full_res_padding,
-    inpainting_fill=sd.inpainting_fill,
-    inpainting_mask_invert=sd.inpainting_mask_invert,
-    mask_blur=sd.mask_blur,
-    mask_image=sd.mask_image,
-    n_iter=sd.n_iter,
-    negative_prompt=sd.negative_prompt,
-    override_settings=sd.override_settings,
-    override_settings_restore_afterwards=sd.override_settings_restore_afterwards,
-    prompt=sd.prompt,
-    resize_mode=sd.resize_mode,
-    restore_faces=sd.restore_faces,
-    s_churn=sd.s_churn,
-    s_noise=sd.s_noise,
-    s_tmax=sd.s_tmax,
-    s_tmin=sd.s_tmin,
-    sampler_name=sd.sampler_name,
-    save_images=sd.save_images,
-    script_args=sd.script_args,
-    script_name=sd.script_name,
-    seed=sd.seed,
-    seed_resize_from_h=sd.seed_resize_from_h,
-    seed_resize_from_w=sd.seed_resize_from_w,
-    send_images=sd.send_images,
-    steps=sd.steps,
-    styles=sd.styles,
-    subseed=sd.subseed,
-    subseed_strength=sd.subseed_strength,
-    tiling=sd.tiling,
-    use_async=sd.use_async,
-    use_deprecated_controlnet=sd.use_deprecated_controlnet,
-    width=sd.width,
-) -> list[Image.Image]:
-    return sd.api.img2img(
-        alwayson_scripts=alwayson_scripts,
-        batch_size=batch_size,
-        cfg_scale=cfg_scale,
-        controlnet_units=controlnet_units,
-        denoising_strength=denoising_strength,
-        do_not_save_grid=do_not_save_grid,
-        do_not_save_samples=do_not_save_samples,
-        eta=eta,
-        height=height,
-        image_cfg_scale=image_cfg_scale,
-        images=images,
-        include_init_images=include_init_images,
-        initial_noise_multiplier=initial_noise_multiplier,
-        inpaint_full_res=inpaint_full_res,
-        inpaint_full_res_padding=inpaint_full_res_padding,
-        inpainting_fill=inpainting_fill,
-        inpainting_mask_invert=inpainting_mask_invert,
-        mask_blur=mask_blur,
-        mask_image=mask_image,
-        n_iter=n_iter,
-        negative_prompt=negative_prompt,
-        override_settings=override_settings,
-        override_settings_restore_afterwards=override_settings_restore_afterwards,
-        prompt=prompt,
-        resize_mode=resize_mode,
-        restore_faces=restore_faces,
-        s_churn=s_churn,
-        s_noise=s_noise,
-        s_tmax=s_tmax,
-        s_tmin=s_tmin,
-        sampler_name=sampler_name,
-        save_images=save_images,
-        script_args=script_args,
-        script_name=script_name,
-        seed=seed,
-        seed_resize_from_h=seed_resize_from_h,
-        seed_resize_from_w=seed_resize_from_w,
-        send_images=send_images,
-        steps=steps,
-        styles=styles,
-        subseed=subseed,
-        subseed_strength=subseed_strength,
-        tiling=tiling,
-        use_async=use_async,
-        use_deprecated_controlnet=use_deprecated_controlnet,
-        width=width,
+def ESI():
+    return sd.api.extra_single_image(
+        image=sd.image,
+        resize_mode=sd.resize_mode,
+        show_extras_results=sd.show_extras_results,
+        gfpgan_visibility=sd.gfpgan_visibility,
+        codeformer_visibility=sd.codeformer_visibility,
+        codeformer_weight=sd.codeformer_weight,
+        upscaling_resize=sd.upscaling_resize,
+        upscaling_resize_w=sd.upscaling_resize_w,
+        upscaling_resize_h=sd.upscaling_resize_h,
+        upscaling_crop=sd.upscaling_crop,
+        upscaler_1=sd.upscaler_1,
+        upscaler_2=sd.upscaler_2,
+        extras_upscaler_2_visibility=sd.extras_upscaler_2_visibility,
+        upscale_first=sd.upscale_first,
+        use_async=sd.use_async,
+    )
+
+
+def EBI():
+    return sd.api.extra_batch_images(
+        images=sd.images,
+        name_list=sd.name_list,
+        resize_mode=sd.resize_mode,
+        show_extras_results=sd.show_extras_results,
+        gfpgan_visibility=sd.gfpgan_visibility,
+        codeformer_visibility=sd.codeformer_visibility,
+        codeformer_weight=sd.codeformer_weight,
+        upscaling_resize=sd.upscaling_resize,
+        upscaling_resize_w=sd.upscaling_resize_w,
+        upscaling_resize_h=sd.upscaling_resize_h,
+        upscaling_crop=sd.upscaling_crop,
+        upscaler_1=sd.upscaler_1,
+        upscaler_2=sd.upscaler_2,
+        extras_upscaler_2_visibility=sd.extras_upscaler_2_visibility,
+        upscale_first=sd.upscale_first,
+        use_async=sd.use_async,
+    )
+
+
+def TXT2IMG() -> Image.Image:
+    return sd.api.txt2img(
+        enable_hr=sd.enable_hr,
+        denoising_strength=sd.denoising_strength,
+        firstphase_width=sd.firstphase_width,
+        firstphase_height=sd.firstphase_height,
+        hr_scale=sd.hr_scale,
+        hr_upscaler=sd.hr_upscaler,
+        hr_second_pass_steps=sd.hr_second_pass_steps,
+        hr_resize_x=sd.hr_resize_x,
+        hr_resize_y=sd.hr_resize_y,
+        prompt=sd.prompt,
+        styles=sd.styles,
+        seed=sd.seed,
+        subseed=sd.subseed,
+        subseed_strength=sd.subseed_strength,
+        seed_resize_from_h=sd.seed_resize_from_h,
+        seed_resize_from_w=sd.seed_resize_from_w,
+        sampler_name=sd.sampler_name,
+        batch_size=sd.batch_size,
+        n_iter=sd.n_iter,
+        steps=sd.steps,
+        cfg_scale=sd.cfg_scale,
+        width=sd.width,
+        height=sd.height,
+        restore_faces=sd.restore_faces,
+        tiling=sd.tiling,
+        do_not_save_samples=sd.do_not_save_samples,
+        do_not_save_grid=sd.do_not_save_grid,
+        negative_prompt=sd.negative_prompt,
+        eta=sd.eta,
+        s_churn=sd.s_churn,
+        s_tmax=sd.s_tmax,
+        s_tmin=sd.s_tmin,
+        s_noise=sd.s_noise,
+        override_settings=sd.override_settings,
+        override_settings_restore_afterwards=sd.override_settings_restore_afterwards,
+        script_args=sd.script_args,
+        script_name=sd.script_name,
+        send_images=sd.send_images,
+        save_images=sd.save_images,
+        alwayson_scripts=sd.alwayson_scripts,
+        sampler_index="Euler a",
+        use_deprecated_controlnet=False,
+        use_async=False,
     )
 
 
@@ -1695,170 +1606,6 @@ def _gen_img_facepass():
         print("")
 
 
-def IMG2IMG() -> list[Image.Image]:
-    return sd.api.img2img(
-        steps=sd.steps,
-        images=sd.images,
-        resize_mode=sd.resize_mode,
-        denoising_strength=sd.denoising_strength,
-        image_cfg_scale=sd.image_cfg_scale,
-        mask_image=sd.mask_image,
-        mask_blur=sd.mask_blur,
-        inpainting_fill=sd.inpainting_fill,
-        inpaint_full_res=sd.inpaint_full_res,
-        inpaint_full_res_padding=sd.inpaint_full_res_padding,
-        inpainting_mask_invert=sd.inpainting_mask_invert,
-        initial_noise_multiplier=sd.initial_noise_multiplier,
-        prompt=sd.prompt,
-        styles=sd.styles,
-        seed=sd.seed,
-        subseed=sd.subseed,
-        subseed_strength=sd.subseed_strength,
-        seed_resize_from_h=sd.seed_resize_from_h,
-        seed_resize_from_w=sd.seed_resize_from_w,
-        sampler_name=sd.sampler_name,
-        batch_size=sd.batch_size,
-        n_iter=sd.n_iter,
-        cfg_scale=sd.cfg_scale,
-        width=sd.width,
-        height=sd.height,
-        restore_faces=sd.restore_faces,
-        tiling=sd.tiling,
-        do_not_save_samples=sd.do_not_save_samples,
-        do_not_save_grid=sd.do_not_save_grid,
-        negative_prompt=sd.negative_prompt,
-        eta=sd.eta,
-        s_churn=sd.s_churn,
-        s_tmax=sd.s_tmax,
-        s_tmin=sd.s_tmin,
-        s_noise=sd.s_noise,
-        override_settings=sd.override_settings,
-        override_settings_restore_afterwards=sd.override_settings_restore_afterwards,
-        script_args=sd.script_args,
-        include_init_images=sd.include_init_images,
-        script_name=sd.script_name,
-        send_images=sd.send_images,
-        save_images=sd.save_images,
-        alwayson_scripts=sd.alwayson_scripts,
-        controlnet_units=sd.controlnet_units,
-        use_deprecated_controlnet=sd.use_deprecated_controlnet,
-        use_async=sd.use_async,
-    )
-
-
-def ESI():
-    return sd.api.extra_single_image(
-        image=sd.image,
-        resize_mode=sd.resize_mode,
-        show_extras_results=sd.show_extras_results,
-        gfpgan_visibility=sd.gfpgan_visibility,
-        codeformer_visibility=sd.codeformer_visibility,
-        codeformer_weight=sd.codeformer_weight,
-        upscaling_resize=sd.upscaling_resize,
-        upscaling_resize_w=sd.upscaling_resize_w,
-        upscaling_resize_h=sd.upscaling_resize_h,
-        upscaling_crop=sd.upscaling_crop,
-        upscaler_1=sd.upscaler_1,
-        upscaler_2=sd.upscaler_2,
-        extras_upscaler_2_visibility=sd.extras_upscaler_2_visibility,
-        upscale_first=sd.upscale_first,
-        use_async=sd.use_async,
-    )
-
-
-def EBI():
-    return sd.api.extra_batch_images(
-        images=sd.images,
-        name_list=sd.name_list,
-        resize_mode=sd.resize_mode,
-        show_extras_results=sd.show_extras_results,
-        gfpgan_visibility=sd.gfpgan_visibility,
-        codeformer_visibility=sd.codeformer_visibility,
-        codeformer_weight=sd.codeformer_weight,
-        upscaling_resize=sd.upscaling_resize,
-        upscaling_resize_w=sd.upscaling_resize_w,
-        upscaling_resize_h=sd.upscaling_resize_h,
-        upscaling_crop=sd.upscaling_crop,
-        upscaler_1=sd.upscaler_1,
-        upscaler_2=sd.upscaler_2,
-        extras_upscaler_2_visibility=sd.extras_upscaler_2_visibility,
-        upscale_first=sd.upscale_first,
-        use_async=sd.use_async,
-    )
-
-
-def TXT2IMG() -> Image.Image:
-    return sd.api.txt2img(
-        enable_hr=sd.enable_hr,
-        denoising_strength=sd.denoising_strength,
-        firstphase_width=sd.firstphase_width,
-        firstphase_height=sd.firstphase_height,
-        hr_scale=sd.hr_scale,
-        hr_upscaler=sd.hr_upscaler,
-        hr_second_pass_steps=sd.hr_second_pass_steps,
-        hr_resize_x=sd.hr_resize_x,
-        hr_resize_y=sd.hr_resize_y,
-        prompt=sd.prompt,
-        styles=sd.styles,
-        seed=sd.seed,
-        subseed=sd.subseed,
-        subseed_strength=sd.subseed_strength,
-        seed_resize_from_h=sd.seed_resize_from_h,
-        seed_resize_from_w=sd.seed_resize_from_w,
-        sampler_name=sd.sampler_name,
-        batch_size=sd.batch_size,
-        n_iter=sd.n_iter,
-        steps=sd.steps,
-        cfg_scale=sd.cfg_scale,
-        width=sd.width,
-        height=sd.height,
-        restore_faces=sd.restore_faces,
-        tiling=sd.tiling,
-        do_not_save_samples=sd.do_not_save_samples,
-        do_not_save_grid=sd.do_not_save_grid,
-        negative_prompt=sd.negative_prompt,
-        eta=sd.eta,
-        s_churn=sd.s_churn,
-        s_tmax=sd.s_tmax,
-        s_tmin=sd.s_tmin,
-        s_noise=sd.s_noise,
-        override_settings=sd.override_settings,
-        override_settings_restore_afterwards=sd.override_settings_restore_afterwards,
-        script_args=sd.script_args,
-        script_name=sd.script_name,
-        send_images=sd.send_images,
-        save_images=sd.save_images,
-        alwayson_scripts=sd.alwayson_scripts,
-        sampler_index="Euler a",
-        use_deprecated_controlnet=False,
-        use_async=False,
-    )
-
-
-sd.negative_prompt = "bad-hands-5,  EasyNegative, worst quality, low quality ,(watermark, white border, monochrome, greyscale, text, speech bubble, artist name, signature),  epiCPhotoGasm-softPhoto-neg,  FastNegativeV2"
-
-sd.CUSTOM_MODELS = [
-    "SUBJECT_FACE_LORA1",
-    "SUBJECT_FACE_LORA2",
-    "SUBJECT_FACE_LORA3",
-    "SUBJECT_FACE_LORA14",
-]
-
-sd.EXTRA_KW = "SUBJECT_ACTIVATION_KW,"
-
-sd.folder = rf"F:/wat/test2/"
-
-sd.weight_seq = [
-    ["0.15:0.15", "0.15:0.15", "0.15:0.15", "0.15:0.15"],
-    ["0.75:0.45", "0.75:0.65", "0.75:0.35", "0.75:0.35"],  # face
-    ["0.75:0.45", "0.75:0.65", "0.75:0.35", "0.75:0.35"],  # face
-    ["0.15:0.25", "0.15:0.25", "0.15:0.25", "0.15:0.15"],
-    ["0.15:0.35", "0.15:0.35", "0.15:0.35", "0.15:0.15"],
-    ["0.75:0.45", "0.75:0.65", "0.75:0.35", "0.75:0.35"],  # face
-    ["0.75:0.45", "0.75:0.65", "0.75:0.35", "0.75:0.35"],  # face
-    ["0.15:0.45", "0.15:0.65", "0.15:0.35", "0.15:0.15"],
-]
-
 _rp = lambda x: x[randint(0, len(x) - 1)]
 
 
@@ -1926,6 +1673,31 @@ def _gen_lora_matching(kw_search: str):
         print("")
         print(str(f"Total Time: {strt_tot.total_seconds()}"))
         print("")
+
+
+sd.negative_prompt = "bad-hands-5,  EasyNegative, worst quality, low quality ,(watermark, white border, monochrome, greyscale, text, speech bubble, artist name, signature),  epiCPhotoGasm-softPhoto-neg,  FastNegativeV2"
+
+sd.CUSTOM_MODELS = [
+    "SUBJECT_FACE_LORA1",
+    "SUBJECT_FACE_LORA2",
+    "SUBJECT_FACE_LORA3",
+    "SUBJECT_FACE_LORA14",
+]
+
+sd.EXTRA_KW = "SUBJECT_ACTIVATION_KW,"
+
+sd.folder = rf"F:/wat/test2/"
+
+sd.weight_seq = [
+    ["0.15:0.15", "0.15:0.15", "0.15:0.15", "0.15:0.15"],
+    ["0.75:0.45", "0.75:0.65", "0.75:0.35", "0.75:0.35"],  # face
+    ["0.75:0.45", "0.75:0.65", "0.75:0.35", "0.75:0.35"],  # face
+    ["0.15:0.25", "0.15:0.25", "0.15:0.25", "0.15:0.15"],
+    ["0.15:0.35", "0.15:0.35", "0.15:0.35", "0.15:0.15"],
+    ["0.75:0.45", "0.75:0.65", "0.75:0.35", "0.75:0.35"],  # face
+    ["0.75:0.45", "0.75:0.65", "0.75:0.35", "0.75:0.35"],  # face
+    ["0.15:0.45", "0.15:0.65", "0.15:0.35", "0.15:0.15"],
+]
 
 
 def model_rotate(model_no: int):
