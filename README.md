@@ -53,7 +53,11 @@
 17. Runs 2 final IMAGE2IMAGE passes
 
 
-
+## TODO
+1. Sliding Weight Scale for tag frequencies
+2. global model sequencing ```[model_1, model_2, ... ]```
+3. cv2.addWeighted / Face Box edge fuzzing / histogram matching
+4. Image Pass -> Face Pass w/ api DDB Tagging
 
 
 shout out to:
