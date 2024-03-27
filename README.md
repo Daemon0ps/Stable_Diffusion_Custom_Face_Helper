@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./matplotlib.jpg" alt="Size Limit CLI" width="738">
+  <img src="./matplotlib.jpg" alt="Size Limit CLI" width="2400">
 </p>
 
 **This is my custom workflow to inject LORAs based on frequency matching, and does multiple Face Pass iterations by identifying faces, and running mutliple IMAGE2IMAGE passes after designating custom LORA models to insert a particular person into image generations.**
@@ -71,23 +71,31 @@ shout out to:
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
-_GET_LIST_ = lambda fp, exts: [
-    fp + f
-    for f in os.listdir(fp[:-1:])
-    if os.path.isfile(fp + f) and str(f[-(f[::-1].find(".")) :]).lower() in exts
-]
+weight_seq = [
+    ["0.15:0.15", "0.15:0.15", "0.15:0.15", "0.15:0.15"],
+    ["0.75:0.45", "0.75:0.65", "0.75:0.35", "0.75:0.35"],  # face
+    ["0.75:0.45", "0.75:0.65", "0.75:0.35", "0.75:0.35"],  # face
+    ["0.15:0.25", "0.15:0.25", "0.15:0.25", "0.15:0.15"],
+    ["0.15:0.35", "0.15:0.35", "0.15:0.35", "0.15:0.15"],
+    ["0.75:0.45", "0.75:0.65", "0.75:0.35", "0.75:0.35"],  # face
+    ["0.75:0.45", "0.75:0.65", "0.75:0.35", "0.75:0.35"],  # face
+    ["0.15:0.45", "0.15:0.65", "0.15:0.35", "0.15:0.15"],]
+_GET_LIST_ = lambda fp, exts: [fp+f for f in os.listdir(fp[:-1:]) if os.path.isfile(fp+f) and str(f[-(f[::-1].find('.')):]).lower() in exts]
 fp = 'E:/pic_prog/faces/'
 imglist = sorted([ imf for imf in _GET_LIST_(fp,['jpg'])[::1] if str(imf).find('stacked')==-1],key=lambda x:x,reverse=False)
 imgs = [np.uint8(cv2.imread(im,cv2.IMREAD_COLOR)) for im in imglist]
-avg_h = int(abs(np.average([im.shape[0] for im in imgs])))
-print(avg_h)
-avg_w = int(abs(np.average([im.shape[1] for im in imgs])))
-print(avg_w)
-imgs = [cv2.resize(im,(avg_w,avg_w),interpolation=cv2.INTER_AREA) for im in imgs]
-imgstack_h1 = np.hstack([im for im in imgs[:4]])
-imgstack_h2 = np.hstack([im for im in imgs[-4:]])
-imgstack_v = np.vstack([imgstack_h1,imgstack_h2])
+avg_h,avg_w = (int(abs(np.average([im.shape[0] for im in imgs]))), int(abs(np.average([im.shape[1] for im in imgs]))))
+avg = max(avg_h,avg_w)
+imgs = [cv2.resize(im,(avg,avg),interpolation=cv2.INTER_AREA) for im in imgs]
+imgstack_v = np.vstack([[np.hstack([[im for im in im_arr] for im_arr in [np.array_split(imgs,2)]])]])
 s_img = str(f'{fp}stacked.jpg')
 cv2.imwrite(s_img,imgstack_v)
-plt.figure(figsize=(8,4))
-plt.imshow(imgstack_v[:,:,::-1])```
+params = {"font.size":"12.0","font.family":"monospace","figure.constrained_layout.use": True,"text.color" : "r","figure.facecolor":"k",'figure.figsize':"8,4"}
+plt.rcParams.update(params)
+_, axs = plt.subplots(len(imgs)//4,len(imgs)//2,figsize=(24,12))
+axs = axs.flatten()
+for img, ax, i in zip(imgs, axs, range(len(imgs))):
+    ax.set_axis_off()
+    ax.set_title(f'{i+1}{chr(10)}{chr(44).join(w for w in weight_seq[i])}')
+    ax.imshow(img[:,:,::-1])
+plt.savefig(s_img)```
