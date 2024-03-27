@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="./stacked.jpg" alt="Size Limit CLI" width="738">
+</p>
+
+
 custom workflow for Stable Diffusion via SDWEBUIAPI.
 
 Makes multiple passes using targeted LORA weights and YU_Net to run multiple Image2Image passes to get particular faces.
