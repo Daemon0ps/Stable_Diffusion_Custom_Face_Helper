@@ -102,4 +102,11 @@ for img, ax, i in zip(imgs, axs, range(len(imgs))):
     ax.set_axis_off()
     ax.set_title(f'{i+1}{chr(10)}{chr(44).join(w for w in weight_seq[i])}')
     ax.imshow(img[:,:,::-1])
-plt.savefig(s_img)```
+plt.savefig(s_img)
+```
+<p align="center">
+  <img src="./matplotlib2.jpg" alt="Size Limit CLI" width="2400">
+</p>
+<p align="center">
+  <img src="./matplotlib3.jpg" alt="Size Limit CLI" width="2400">
+</p>
